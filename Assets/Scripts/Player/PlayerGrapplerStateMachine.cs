@@ -16,7 +16,13 @@ namespace Player
             _core = GetComponent<PlayerCore>();
         }
         
-        public override Vector2 GetGrappleInputPos() => _core.Input.GetAimPos(MyPhysObj.transform.position);
+        public override Vector2 GetGrappleInputPos() {
+            Vector2 rawPos = _core.Input.GetAimPos(MyPhysObj.transform.position);
+            Vector2 rawDirection = rawPos - (Vector2) MyPhysObj.transform.position;
+            Vector2 transformedDirection = AimAssistSystem.TransformAim(MyPhysObj.transform.position, rawDirection);
+            Vector2 transformedPosition = rawDirection.magnitude * transformedDirection.normalized + (Vector2) MyPhysObj.transform.position;
+            return transformedPosition;
+        }
 
         protected override Vector2 CollideHorizontalGrapple() {
             return new Vector2(0, Mathf.Abs(_core.Actor.velocityX * _core.HitWallGrappleMult));
